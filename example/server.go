@@ -2,12 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/lishank0119/fibril"
-	"log"
-	"time"
-
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/lishank0119/fibril"
+	"log"
 )
 
 func main() {
@@ -36,22 +34,20 @@ func main() {
 			return c.UUID != client.UUID
 		})
 
-		time.AfterFunc(time.Millisecond*100, func() {
-			id, ok := client.GetKey("id")
-			if ok {
-				if err := f.SendTextToClient(client.UUID, fmt.Sprintf("Hello %v", id)); err != nil {
-					return
-				}
+		id, ok := client.GetKey("id")
+		if ok {
+			if err := f.SendTextToClient(client.UUID, fmt.Sprintf("Hello %v", id)); err != nil {
+				return
+			}
+		}
+
+		// kick same id
+		f.DisconnectClientFilter("same id", func(c *fibril.Client) bool {
+			if fID, ok := c.GetKey("id"); ok {
+				return c.UUID != client.UUID && id == fID
 			}
 
-			// kick same id
-			f.DisconnectClientFilter("same id", func(c *fibril.Client) bool {
-				if fID, ok := client.GetKey("id"); ok {
-					return c.UUID != client.UUID && id == fID
-				}
-
-				return false
-			})
+			return false
 		})
 	})
 

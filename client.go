@@ -49,8 +49,18 @@ loop:
 				return
 			}
 
+			if b.t == websocket.CloseMessage {
+				if err := c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, string(b.msg))); err != nil {
+					c.opt.errorHandler(c, err)
+				}
+
+				time.Sleep(c.opt.disconnectDelayClose)
+				break loop
+			}
+
 			err := c.conn.WriteMessage(b.t, b.msg)
 			if err != nil {
+				c.opt.errorHandler(c, err)
 				return
 			}
 
@@ -71,9 +81,8 @@ loop:
 
 func (c *Client) readPump() {
 	defer func() {
-		c.hub.unregister <- c
+		c.hub.unregisterClient(c)
 		c.close()
-		c.opt.disconnectHandler(c)
 	}()
 
 	c.conn.SetReadLimit(c.opt.maxMessageSize)
@@ -111,11 +120,7 @@ func (c *Client) readPump() {
 }
 
 func (c *Client) Disconnect(closeMsg string) {
-	if err := c.conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, closeMsg)); err != nil {
-		c.opt.errorHandler(c, err)
-	}
-	time.Sleep(c.opt.disconnectDelayClose)
-	c.close()
+	c.send <- box{t: websocket.CloseMessage, msg: []byte(closeMsg)}
 }
 
 func (c *Client) close() {
@@ -192,7 +197,7 @@ func newClient(hub *Hub, conn *websocket.Conn, option *option, keys map[any]any)
 		}
 	}
 
-	client.hub.register <- client
+	client.hub.registerClient(client)
 
 	client.open.Store(true)
 

@@ -6,19 +6,14 @@ import (
 )
 
 type Hub struct {
-	clientMap  *shardingmap.ShardingMap[string, *Client]
-	broadcast  chan box
-	register   chan *Client
-	unregister chan *Client
+	opt       *option
+	clientMap *shardingmap.ShardingMap[string, *Client]
+	broadcast chan box
 }
 
 func (h *Hub) run() {
 	for {
 		select {
-		case client := <-h.register:
-			h.clientMap.Set(client.UUID, client)
-		case client := <-h.unregister:
-			h.clientMap.Delete(client.UUID)
 		case b := <-h.broadcast:
 			h.clientMap.ForEach(func(uuid string, client *Client) {
 				if b.filter == nil {
@@ -29,6 +24,15 @@ func (h *Hub) run() {
 			})
 		}
 	}
+}
+
+func (h *Hub) registerClient(client *Client) {
+	h.clientMap.Set(client.UUID, client)
+}
+
+func (h *Hub) unregisterClient(client *Client) {
+	h.clientMap.Delete(client.UUID)
+	h.opt.disconnectHandler(client)
 }
 
 func (h *Hub) disconnectClientFilter(closeMsg string, fn filterFunc) {
@@ -84,9 +88,8 @@ func newHub(opt *option) *Hub {
 	)
 
 	return &Hub{
-		clientMap:  m,
-		broadcast:  make(chan box),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
+		opt:       opt,
+		clientMap: m,
+		broadcast: make(chan box),
 	}
 }
