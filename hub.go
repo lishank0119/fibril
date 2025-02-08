@@ -13,8 +13,8 @@ type Hub struct {
 	pubSub    *pubsub.PubSub
 }
 
-func (h *Hub) publish(topic string, msg []byte) {
-	h.pubSub.Publish(topic, msg)
+func (h *Hub) publish(topic string, msg []byte) error {
+	return h.pubSub.Publish(topic, msg)
 }
 
 func (h *Hub) run() {
@@ -96,7 +96,10 @@ func newHub(opt *option) *Hub {
 	return &Hub{
 		opt:       opt,
 		clientMap: m,
-		pubSub:    pubsub.NewPubSub(),
+		pubSub: pubsub.NewPubSub(&pubsub.Config{
+			BucketNum:           opt.shardCount,
+			BucketMessageBuffer: opt.messageBufferSize * 2,
+		}),
 		broadcast: make(chan box),
 	}
 }

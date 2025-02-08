@@ -198,7 +198,7 @@ func newClient(hub *Hub, conn *websocket.Conn, option *option, keys map[any]any)
 		opt:  option,
 		conn: conn,
 		send: make(chan box, option.messageBufferSize),
-		sub:  hub.pubSub.NewSubscriber(option.messageBufferSize),
+		sub:  hub.pubSub.NewSubscriber(),
 		exit: make(chan bool),
 	}
 

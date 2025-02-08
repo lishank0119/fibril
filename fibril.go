@@ -7,8 +7,8 @@ type Fibril struct {
 	hub    *Hub
 }
 
-func (f *Fibril) Publish(topic string, msg []byte) {
-	f.hub.publish(topic, msg)
+func (f *Fibril) Publish(topic string, msg []byte) error {
+	return f.hub.publish(topic, msg)
 }
 
 func (f *Fibril) SendTextToClient(uuid string, msg string) error {

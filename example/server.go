@@ -13,8 +13,6 @@ func main() {
 	app := fiber.New()
 
 	app.Use("/ws", func(c *fiber.Ctx) error {
-		// IsWebSocketUpgrade returns true if the client
-		// requested upgrade to the WebSocket protocol.
 		if websocket.IsWebSocketUpgrade(c) {
 			c.Locals("allowed", true)
 			return c.Next()
@@ -56,7 +54,7 @@ func main() {
 		client.Subscribe("server-time", func(msg []byte) {
 			err := client.WriteText(string(msg))
 			if err != nil {
-				log.Println(err)
+				log.Println(err, client.UUID)
 				return
 			}
 		})
@@ -72,7 +70,7 @@ func main() {
 	})
 
 	f.ErrorHandler(func(client *fibril.Client, err error) {
-		log.Printf("uuid:%s error:%v", client.UUID, err)
+		log.Fatalf("uuid:%s error:%v \n", client.UUID, err)
 	})
 
 	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
@@ -88,7 +86,11 @@ func PublishServerTime(f *fibril.Fibril) {
 	for {
 		select {
 		case <-ticker.C:
-			f.Publish("server-time", []byte(time.Now().Format(time.RFC3339)))
+			err := f.Publish("server-time", []byte(time.Now().Format(time.RFC3339)))
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
 		}
 	}
 }
