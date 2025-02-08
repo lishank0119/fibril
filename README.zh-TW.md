@@ -126,8 +126,8 @@ func publishServerTime(f *fibril.Fibril) {
 
 ```go
 f := fibril.New(
-fibril.WithShardCount(20),
-fibril.WithMaxMessageSize(1024),
+    fibril.WithShardCount(20),
+    fibril.WithMaxMessageSize(1024),
 )
 ```
 
