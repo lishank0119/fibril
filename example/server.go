@@ -28,7 +28,7 @@ func main() {
 	)
 
 	// Start a goroutine to periodically publish server time
-	go PublishServerTime(f)
+	go publishServerTime(f)
 
 	// Set up the WebSocket connection handler
 	f.ConnectHandler(func(client *fibril.Client) {
@@ -95,8 +95,8 @@ func main() {
 	log.Fatal(app.Listen(":3000")) // Start the Fiber server on port 3000
 }
 
-// PublishServerTime sends the current server time to the "server-time" topic every second
-func PublishServerTime(f *fibril.Fibril) {
+// publishServerTime sends the current server time to the "server-time" topic every second
+func publishServerTime(f *fibril.Fibril) {
 	IntervalTime := 1 * time.Second
 	ticker := time.NewTicker(IntervalTime)
 	for {
