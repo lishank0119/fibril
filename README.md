@@ -83,26 +83,26 @@ func main() {
 
 ```go
 client.Subscribe("server-time", func (msg []byte) {
-err := client.WriteText(string(msg))
-if err != nil {
-log.Println("Error sending server time:", err, "UUID:", client.UUID)
-return
-}
+    err := client.WriteText(string(msg))
+    if err != nil {
+        log.Println("Error sending server time:", err, "UUID:", client.UUID)
+        return
+    }
 })
 
 func publishServerTime(f *fibril.Fibril) {
-IntervalTime := 1 * time.Second
-ticker := time.NewTicker(IntervalTime)
-for {
-select {
-case <-ticker.C:
-err := f.Publish("server-time", []byte(time.Now().Format(time.RFC3339)))
-if err != nil {
-log.Fatal(err)
-return
-}
-}
-}
+    IntervalTime := 1 * time.Second
+    ticker := time.NewTicker(IntervalTime)
+    for {
+        select {
+            case <-ticker.C:
+            err := f.Publish("server-time", []byte(time.Now().Format(time.RFC3339)))
+            if err != nil {
+            log.Fatal(err)
+            return
+            }
+        }
+    }
 }
 ```
 
