@@ -2,6 +2,7 @@ package fibril
 
 import (
 	"github.com/gofiber/contrib/websocket"
+	"github.com/lishank0119/pubsub"
 	"github.com/lishank0119/shardingmap"
 )
 
@@ -9,6 +10,11 @@ type Hub struct {
 	opt       *option
 	clientMap *shardingmap.ShardingMap[string, *Client]
 	broadcast chan box
+	pubSub    *pubsub.PubSub
+}
+
+func (h *Hub) publish(topic string, msg []byte) {
+	h.pubSub.Publish(topic, msg)
 }
 
 func (h *Hub) run() {
@@ -90,6 +96,7 @@ func newHub(opt *option) *Hub {
 	return &Hub{
 		opt:       opt,
 		clientMap: m,
+		pubSub:    pubsub.NewPubSub(),
 		broadcast: make(chan box),
 	}
 }

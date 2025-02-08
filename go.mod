@@ -6,6 +6,7 @@ require (
 	github.com/gofiber/contrib/websocket v1.3.3
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/google/uuid v1.6.0
+	github.com/lishank0119/pubsub v0.0.1
 	github.com/lishank0119/shardingmap v0.0.2
 )
 

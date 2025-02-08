@@ -3,6 +3,7 @@ package fibril
 import (
 	"github.com/gofiber/contrib/websocket"
 	"github.com/google/uuid"
+	"github.com/lishank0119/pubsub"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -19,6 +20,11 @@ type Client struct {
 	exit chan bool
 	keys sync.Map
 	once sync.Once
+	sub  *pubsub.Subscriber
+}
+
+func (c *Client) Subscribe(topic string, handler pubsub.HandlerFunc) {
+	c.sub.Subscribe(topic, handler)
 }
 
 func (c *Client) isOpen() bool {
@@ -80,10 +86,7 @@ loop:
 }
 
 func (c *Client) readPump() {
-	defer func() {
-		c.hub.unregisterClient(c)
-		c.close()
-	}()
+	defer c.destroy()
 
 	c.conn.SetReadLimit(c.opt.maxMessageSize)
 	_ = c.conn.SetReadDeadline(time.Now().Add(c.opt.pongWait))
@@ -120,7 +123,14 @@ func (c *Client) readPump() {
 }
 
 func (c *Client) Disconnect(closeMsg string) {
-	c.send <- box{t: websocket.CloseMessage, msg: []byte(closeMsg)}
+	message := box{t: websocket.CloseMessage, msg: []byte(closeMsg)}
+	c.writeMessage(message)
+}
+
+func (c *Client) destroy() {
+	c.sub.UnsubscribeAll()
+	c.hub.unregisterClient(c)
+	c.close()
 }
 
 func (c *Client) close() {
@@ -188,6 +198,7 @@ func newClient(hub *Hub, conn *websocket.Conn, option *option, keys map[any]any)
 		opt:  option,
 		conn: conn,
 		send: make(chan box, option.messageBufferSize),
+		sub:  hub.pubSub.NewSubscriber(option.messageBufferSize),
 		exit: make(chan bool),
 	}
 

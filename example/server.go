@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/lishank0119/fibril"
 	"log"
+	"time"
 )
 
 func main() {
@@ -22,6 +23,8 @@ func main() {
 	})
 
 	f := fibril.New()
+
+	go PublishServerTime(f)
 
 	f.ConnectHandler(func(client *fibril.Client) {
 		log.Println("connect uuid:", client.UUID)
@@ -49,6 +52,14 @@ func main() {
 
 			return false
 		})
+
+		client.Subscribe("server-time", func(msg []byte) {
+			err := client.WriteText(string(msg))
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		})
 	})
 
 	f.TextMessageHandler(func(client *fibril.Client, msg string) {
@@ -69,4 +80,15 @@ func main() {
 	}))
 
 	log.Fatal(app.Listen(":3000"))
+}
+
+func PublishServerTime(f *fibril.Fibril) {
+	IntervalTime := 1 * time.Second
+	ticker := time.NewTicker(IntervalTime)
+	for {
+		select {
+		case <-ticker.C:
+			f.Publish("server-time", []byte(time.Now().Format(time.RFC3339)))
+		}
+	}
 }
