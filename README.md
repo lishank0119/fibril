@@ -176,7 +176,7 @@ f.DisconnectClientFilter("Maintenance", func(c *fibril.Client) bool {
 
 ```go
 f.ConnectHandler(func(client *fibril.Client) {
-	log.Println("Client connected:", client.UUID)
+	log.Println("Client connected:", client.GetUUID())
 })
 ```
 
@@ -184,7 +184,7 @@ f.ConnectHandler(func(client *fibril.Client) {
 
 ```go
 f.DisconnectHandler(func(client *fibril.Client) {
-	log.Println("Client disconnected:", client.UUID)
+	log.Println("Client disconnected:", client.GetUUID())
 })
 ```
 
@@ -192,7 +192,7 @@ f.DisconnectHandler(func(client *fibril.Client) {
 
 ```go
 f.ErrorHandler(func(client *fibril.Client, err error) {
-	log.Println("Error for client", client.UUID, ":", err)
+	log.Println("Error for client", client.GetUUID(), ":", err)
 })
 ```
 
@@ -216,7 +216,7 @@ f.BinaryMessageHandler(func(client *fibril.Client, msg []byte) {
 
 ```go
 f.PongHandler(func(client *fibril.Client) {
-	log.Println("Pong received from:", client.UUID)
+	log.Println("Pong received from:", client.GetUUID())
 })
 ```
 

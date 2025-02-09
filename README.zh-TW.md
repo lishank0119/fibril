@@ -171,7 +171,7 @@ f.DisconnectClientFilter("維護中", func(c *fibril.Client) bool {
 
 ```go
 f.ConnectHandler(func(client *fibril.Client) {
-	log.Println("客戶端已連接:", client.UUID)
+	log.Println("客戶端已連接:", client.GetUUID())
 })
 ```
 
@@ -179,7 +179,7 @@ f.ConnectHandler(func(client *fibril.Client) {
 
 ```go
 f.DisconnectHandler(func(client *fibril.Client) {
-	log.Println("客戶端已斷開:", client.UUID)
+	log.Println("客戶端已斷開:", client.GetUUID())
 })
 ```
 
@@ -187,7 +187,7 @@ f.DisconnectHandler(func(client *fibril.Client) {
 
 ```go
 f.ErrorHandler(func(client *fibril.Client, err error) {
-	log.Println("客戶端", client.UUID, "錯誤:", err)
+	log.Println("客戶端", client.GetUUID(), "錯誤:", err)
 })
 ```
 
@@ -211,7 +211,7 @@ f.BinaryMessageHandler(func(client *fibril.Client, msg []byte) {
 
 ```go
 f.PongHandler(func(client *fibril.Client) {
-	log.Println("收到來自:", client.UUID, "的 Pong")
+	log.Println("收到來自:", client.GetUUID(), "的 Pong")
 })
 ```
 
