@@ -34,7 +34,7 @@ func main() {
 	f.ConnectHandler(func(client *fibril.Client) {
 		// Log client connection and send a welcome message
 		log.Println("Client connected, UUID:", client.UUID)
-		if err := client.WriteText("Welcome!"); err != nil {
+		if err := client.SendText("Welcome!"); err != nil {
 			log.Println("Error sending welcome message:", err)
 			return
 		}
@@ -63,7 +63,7 @@ func main() {
 
 		// Subscribe the client to the "server-time" topic and send server time on update
 		client.Subscribe("server-time", func(msg []byte) {
-			err := client.WriteText(string(msg))
+			err := client.SendText(string(msg))
 			if err != nil {
 				log.Println("Error sending server time:", err, "UUID:", client.UUID)
 				return

@@ -186,8 +186,8 @@ func (c *Client) writeMessage(message box) {
 	}
 }
 
-// WriteText sends a text message to the client.
-func (c *Client) WriteText(msg string) error {
+// SendText sends a text message to the client.
+func (c *Client) SendText(msg string) error {
 	if !c.isOpen() {
 		return ErrClientClosed
 	}
@@ -196,8 +196,8 @@ func (c *Client) WriteText(msg string) error {
 	return nil
 }
 
-// WriteBinary sends a binary message to the client.
-func (c *Client) WriteBinary(msg []byte) error {
+// SendBinary sends a binary message to the client.
+func (c *Client) SendBinary(msg []byte) error {
 	if !c.isOpen() {
 		return ErrClientClosed
 	}
