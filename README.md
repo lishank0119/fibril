@@ -1,5 +1,6 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/lishank0119/fibril.svg)](https://pkg.go.dev/github.com/lishank0119/fibril)
 [![go.mod](https://img.shields.io/github/go-mod/go-version/lishank0119/fibril)](go.mod)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lishank0119/fibril)](https://goreportcard.com/report/github.com/lishank0119/fibril)
 
 # Fibril - A WebSocket Library for Go
 
