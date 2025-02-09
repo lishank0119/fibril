@@ -33,21 +33,21 @@ func main() {
 	// Set up the WebSocket connection handler
 	f.ConnectHandler(func(client *fibril.Client) {
 		// Log client connection and send a welcome message
-		log.Println("Client connected, UUID:", client.UUID)
+		log.Println("Client connected, UUID:", client.GetUUID())
 		if err := client.SendText("Welcome!"); err != nil {
 			log.Println("Error sending welcome message:", err)
 			return
 		}
 
 		// Broadcast welcome message to all clients except the one connecting
-		f.BroadcastTextFilter(fmt.Sprintf("Welcome! UUID: %s", client.UUID), func(c *fibril.Client) bool {
-			return c.UUID != client.UUID
+		f.BroadcastTextFilter(fmt.Sprintf("Welcome! UUID: %s", client.GetUUID()), func(c *fibril.Client) bool {
+			return client.GetUUID() != client.GetUUID()
 		})
 
 		// Send a personalized message if client has an "id" key
 		id, ok := client.GetKey("id")
 		if ok {
-			if err := f.SendTextToClient(client.UUID, fmt.Sprintf("Hello %v", id)); err != nil {
+			if err := f.SendTextToClient(client.GetUUID(), fmt.Sprintf("Hello %v", id)); err != nil {
 				log.Println("Error sending personalized message:", err)
 				return
 			}
@@ -56,7 +56,7 @@ func main() {
 		// Disconnect clients with the same "id"
 		f.DisconnectClientFilter("Duplicate ID detected", func(c *fibril.Client) bool {
 			if fID, ok := c.GetKey("id"); ok {
-				return c.UUID != client.UUID && id == fID
+				return c.GetUUID() != client.GetUUID() && id == fID
 			}
 			return false
 		})
@@ -65,7 +65,7 @@ func main() {
 		client.Subscribe("server-time", func(msg []byte) {
 			err := client.SendText(string(msg))
 			if err != nil {
-				log.Println("Error sending server time:", err, "UUID:", client.UUID)
+				log.Println("Error sending server time:", err, "UUID:", client.GetUUID())
 				return
 			}
 		})
@@ -73,18 +73,18 @@ func main() {
 
 	// Handle incoming text messages from clients
 	f.TextMessageHandler(func(client *fibril.Client, msg string) {
-		log.Println("Received message from UUID:", client.UUID, "Message:", msg)
+		log.Println("Received message from UUID:", client.GetUUID(), "Message:", msg)
 		f.BroadcastText(msg) // Broadcast the received message to all clients
 	})
 
 	// Handle client disconnections
 	f.DisconnectHandler(func(client *fibril.Client) {
-		log.Println("Client disconnected, UUID:", client.UUID)
+		log.Println("Client disconnected, UUID:", client.GetUUID())
 	})
 
 	// Handle errors
 	f.ErrorHandler(func(client *fibril.Client, err error) {
-		log.Fatalf("Error from client UUID:%s, Error: %v \n", client.UUID, err)
+		log.Fatalf("Error from client UUID:%s, Error: %v \n", client.GetUUID(), err)
 	})
 
 	// Set up the WebSocket endpoint with an "id" parameter

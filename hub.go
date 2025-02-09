@@ -37,12 +37,12 @@ func (h *Hub) run() {
 
 // registerClient adds a new client to the client map.
 func (h *Hub) registerClient(client *Client) {
-	h.clientMap.Set(client.UUID, client)
+	h.clientMap.Set(client.GetUUID(), client)
 }
 
 // unregisterClient removes a client from the client map and triggers the disconnect handler.
 func (h *Hub) unregisterClient(client *Client) {
-	h.clientMap.Delete(client.UUID)
+	h.clientMap.Delete(client.GetUUID())
 	h.opt.disconnectHandler(client)
 }
 

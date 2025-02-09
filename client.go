@@ -12,7 +12,7 @@ import (
 
 // Client represents a WebSocket client connection.
 type Client struct {
-	UUID string             // Unique identifier for the client
+	uuid string             // Unique identifier for the client
 	hub  *Hub               // Reference to the Hub managing this client
 	conn *websocket.Conn    // The WebSocket connection
 	send chan box           // Channel for sending messages to the client
@@ -22,6 +22,11 @@ type Client struct {
 	keys sync.Map           // Key-value store for custom client data
 	once sync.Once          // Ensures the close operation is performed only once
 	sub  *pubsub.Subscriber // Subscriber for Pub/Sub messages
+}
+
+// GetUUID returns the unique identifier (UUID) of the client.
+func (c *Client) GetUUID() string {
+	return c.uuid
 }
 
 // Subscribe subscribes the client to a specific topic with a handler function.
@@ -209,7 +214,7 @@ func (c *Client) SendBinary(msg []byte) error {
 // newClient initializes a new WebSocket client and starts its read and write loops.
 func newClient(hub *Hub, conn *websocket.Conn, option *option, keys map[any]any) *Client {
 	client := &Client{
-		UUID: uuid.New().String(),
+		uuid: uuid.New().String(),
 		hub:  hub,
 		opt:  option,
 		conn: conn,

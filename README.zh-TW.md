@@ -39,37 +39,37 @@ go get -u github.com/lishank0119/fibril
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/contrib/websocket"
-	"github.com/lishank0119/fibril"
-	"log"
+  "github.com/gofiber/contrib/websocket"
+  "github.com/gofiber/fiber/v2"
+  "github.com/lishank0119/fibril"
+  "log"
 )
 
 func main() {
-	app := fiber.New()
+  app := fiber.New()
 
-	app.Use("/ws", func(c *fiber.Ctx) error {
-		if websocket.IsWebSocketUpgrade(c) {
-			return c.Next()
-		}
-		return fiber.ErrUpgradeRequired
-	})
+  app.Use("/ws", func(c *fiber.Ctx) error {
+    if websocket.IsWebSocketUpgrade(c) {
+      return c.Next()
+    }
+    return fiber.ErrUpgradeRequired
+  })
 
-	f := fibril.New(
-		fibril.WithShardCount(4),
-		fibril.WithMaxMessageSize(1024),
-	)
+  f := fibril.New(
+    fibril.WithShardCount(4),
+    fibril.WithMaxMessageSize(1024),
+  )
 
-	f.TextMessageHandler(func(client *fibril.Client, msg string) {
-		log.Printf("收到來自 %s 的訊息: %s", client.UUID, msg)
-		f.BroadcastText("回音: " + msg)
-	})
+  f.TextMessageHandler(func(client *fibril.Client, msg string) {
+    log.Printf("收到來自 %s 的訊息: %s", client.GetUUID(), msg)
+    f.BroadcastText("回音: " + msg)
+  })
 
-	app.Get("/ws", websocket.New(func(c *websocket.Conn) {
-		f.RegisterClient(c)
-	}))
+  app.Get("/ws", websocket.New(func(c *websocket.Conn) {
+    f.RegisterClient(c)
+  }))
 
-	log.Fatal(app.Listen(":3000"))
+  log.Fatal(app.Listen(":3000"))
 }
 ```
 
@@ -216,6 +216,14 @@ f.PongHandler(func(client *fibril.Client) {
 ```
 
 ### Client 函式範例
+
+#### GetUUID
+取得客戶端的唯一編號 (UUID)。
+
+```go
+uuid := client.GetUUID()
+log.Printf("Client UUID: %s", uuid)
+```
 
 #### Subscribe
 
