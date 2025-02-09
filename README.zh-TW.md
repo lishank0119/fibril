@@ -2,7 +2,8 @@
 
 [English](README.zh-TW.md)
 
-Fibril 是一個高效能的 WebSocket 函式庫，基於 [GoFiber](https://github.com/gofiber/fiber) 開發，設計用於具有分片和 Pub/Sub 支援的可擴展即時應用程式。
+Fibril 是一個基於 [GoFiber](https://github.com/gofiber/fiber) 的 Go 語言 WebSocket 函式庫，提供了一個穩健且高效的方式來處理
+WebSocket 連接、訊息傳遞和訂閱功能。它支援訊息廣播、客戶端管理以及將訊息發佈至訂閱的主題。
 
 ## 目錄
 

@@ -5,7 +5,9 @@
 
 [中文](README.zh-TW.md)
 
-Fibril is a high-performance WebSocket library built on top of [GoFiber](https://github.com/gofiber/fiber), designed for scalable real-time applications with sharding and pub/sub support.
+Fibril is a Go-based WebSocket library built on top of [GoFiber](https://github.com/gofiber/fiber) that provides a
+robust and efficient way to handle WebSocket connections, messaging, and subscriptions. It supports features like
+message broadcasting, client management, and publishing messages to subscribed topics.
 
 ## Table of Contents
 
