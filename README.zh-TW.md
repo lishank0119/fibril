@@ -1,17 +1,28 @@
 # Fibril - Go 語言 WebSocket 函式庫
 
-[English](README.md)
+[English](README.zh-TW.md)
 
-Fibril 是一個基於 [GoFiber](https://github.com/gofiber/fiber) 的 Go 語言 WebSocket 函式庫，提供了一個穩健且高效的方式來處理
-WebSocket 連接、訊息傳遞和訂閱功能。它支援訊息廣播、客戶端管理以及將訊息發佈至訂閱的主題。
+Fibril 是一個高效能的 WebSocket 函式庫，基於 [GoFiber](https://github.com/gofiber/fiber) 開發，設計用於具有分片和 Pub/Sub 支援的可擴展即時應用程式。
 
-## 特點
+## 目錄
 
-- WebSocket 連接管理。
-- 支援分片（Sharding）來實現可擴展的客戶端管理。
-- 支援發佈/訂閱（Pub/Sub）系統，用於基於主題的訊息傳遞。
-- 可自定義訊息處理程序（文本和二進位）。
-- 優雅的錯誤處理和客戶端斷線處理。
+- [功能](#功能)
+- [安裝](#安裝)
+- [使用方式](#使用方式)
+    - [基本範例](#基本範例)
+    - [Fibril 函式範例](#fibril-函式範例)
+    - [Client 函式範例](#client-函式範例)
+- [配置選項](#配置選項)
+- [貢獻](#貢獻)
+- [授權](#授權)
+
+## 功能
+
+- 🚀 高效能的 WebSocket 伺服器
+- 🔗 內建 Pub/Sub 系統
+- ⚡ 支援分片以提高擴展性
+- 🔒 使用 UUID 進行客戶端管理
+- 🗂️ 為每個客戶端提供自訂的鍵值存儲
 
 ## 安裝
 
@@ -19,122 +30,287 @@ WebSocket 連接、訊息傳遞和訂閱功能。它支援訊息廣播、客戶�
 go get -u github.com/lishank0119/fibril
 ```
 
-## 使用範例
+## 使用方式
 
-### 建立 WebSocket Hub
+### 基本範例
 
 ```go
 package main
 
 import (
-	"fmt"
-	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/lishank0119/fibril"
 	"log"
 )
 
 func main() {
-	// 建立一個新的 Fiber 應用
 	app := fiber.New()
 
-	// WebSocket 端點
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
-			c.Locals("allowed", true)
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
 	})
 
-	// 初始化 Fibril 並設置選項
 	f := fibril.New(
-		fibril.WithShardCount(20),
+		fibril.WithShardCount(4),
 		fibril.WithMaxMessageSize(1024),
 	)
 
-	// 註冊 ConnectHandler
-	f.ConnectHandler(func(client *fibril.Client) {
-		log.Println("Client 連接:", client.UUID)
-		if err := client.WriteText("歡迎！"); err != nil {
-			log.Println(err)
-			return
-		}
-
-		// 廣播歡迎訊息給其他客戶端
-		f.BroadcastText(fmt.Sprintf("歡迎！UUID: %s", client.UUID))
+	f.TextMessageHandler(func(client *fibril.Client, msg string) {
+		log.Printf("收到來自 %s 的訊息: %s", client.UUID, msg)
+		f.BroadcastText("回音: " + msg)
 	})
 
-	// WebSocket 伺服器，處理連接
-	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
-		f.RegisterClientWithKeys(c, map[any]any{"id": c.Params("id")})
+	app.Get("/ws", websocket.New(func(c *websocket.Conn) {
+		f.RegisterClient(c)
 	}))
 
-	// 啟動伺服器
 	log.Fatal(app.Listen(":3000"))
 }
 ```
 
-### Pub/Sub 範例
+### Fibril 函式範例
+
+#### Publish
+
+發佈一條訊息到指定的主題。
 
 ```go
-client.Subscribe("server-time", func (msg []byte) {
-    err := client.WriteText(string(msg))
-    if err != nil {
-        log.Println("Error sending server time:", err, "UUID:", client.UUID)
-        return
-    }
-})
-
-func publishServerTime(f *fibril.Fibril) {
-    IntervalTime := 1 * time.Second
-    ticker := time.NewTicker(IntervalTime)
-    for {
-        select {
-        case <-ticker.C:
-            err := f.Publish("server-time", []byte(time.Now().Format(time.RFC3339)))
-            if err != nil {
-                log.Fatal(err)
-                return
-            }
-        }
-    }
+err := f.Publish("server-time", []byte("2024-02-09T15:04:05Z"))
+if err != nil {
+	log.Println("發佈錯誤:", err)
 }
 ```
 
-### 可用的處理程序
+#### SendTextToClient
+
+發送文字訊息到指定的客戶端。
+
+```go
+err := f.SendTextToClient("client-uuid", "你好，客戶端！")
+if err != nil {
+	log.Println("發送錯誤:", err)
+}
+```
+
+#### SendBinaryToClient
+
+發送二進位資料到指定的客戶端。
+
+```go
+err := f.SendBinaryToClient("client-uuid", []byte{0x01, 0x02, 0x03})
+if err != nil {
+	log.Println("發送錯誤:", err)
+}
+```
+
+#### BroadcastText
+
+向所有連接的客戶端廣播文字訊息。
+
+```go
+f.BroadcastText("大家好！")
+```
+
+#### BroadcastBinary
+
+向所有連接的客戶端廣播二進位資料。
+
+```go
+f.BroadcastBinary([]byte{0x10, 0x20, 0x30})
+```
+
+#### RegisterClient
+
+註冊一個新的 WebSocket 客戶端。
+
+```go
+app.Get("/ws", websocket.New(func(c *websocket.Conn) {
+	f.RegisterClient(c)
+}))
+```
+
+#### RegisterClientWithKeys
+
+註冊一個帶有自訂鍵值對的新 WebSocket 客戶端。
+
+```go
+app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
+	f.RegisterClientWithKeys(c, map[any]any{"id": c.Params("id")})
+}))
+```
+
+#### DisconnectClient
+
+根據 UUID 斷開指定的客戶端。
+
+```go
+err := f.DisconnectClient("再見!", "client-uuid")
+if err != nil {
+	log.Println("斷開連接錯誤:", err)
+}
+```
+
+#### DisconnectClientFilter
+
+根據過濾條件斷開客戶端連接。
+
+```go
+f.DisconnectClientFilter("維護中", func(c *fibril.Client) bool {
+	return c.GetKey("role") == "guest"
+})
+```
+
+#### Handler
 
 - **ConnectHandler**: 處理客戶端連接。
-- **DisconnectHandler**: 處理客戶端斷線。
-- **ErrorHandler**: 處理發生錯誤的客戶端連接。
-- **TextMessageHandler**: 處理文本訊息。
+
+```go
+f.ConnectHandler(func(client *fibril.Client) {
+	log.Println("客戶端已連接:", client.UUID)
+})
+```
+
+- **DisconnectHandler**: 處理客戶端斷開連接。
+
+```go
+f.DisconnectHandler(func(client *fibril.Client) {
+	log.Println("客戶端已斷開:", client.UUID)
+})
+```
+
+- **ErrorHandler**: 處理客戶端連接中發生的錯誤。
+
+```go
+f.ErrorHandler(func(client *fibril.Client, err error) {
+	log.Println("客戶端", client.UUID, "錯誤:", err)
+})
+```
+
+- **TextMessageHandler**: 處理文字訊息。
+
+```go
+f.TextMessageHandler(func(client *fibril.Client, msg string) {
+	log.Println("收到文字訊息:", msg)
+})
+```
+
 - **BinaryMessageHandler**: 處理二進位訊息。
+
+```go
+f.BinaryMessageHandler(func(client *fibril.Client, msg []byte) {
+	log.Println("收到二進位訊息:", msg)
+})
+```
+
 - **PongHandler**: 處理來自客戶端的 Pong 回應。
+
+```go
+f.PongHandler(func(client *fibril.Client) {
+	log.Println("收到來自:", client.UUID, "的 Pong")
+})
+```
+
+### Client 函式範例
+
+#### Subscribe
+
+訂閱客戶端到指定的主題並設置處理函式。
+
+```go
+client.Subscribe("topic-name", func(msg []byte) {
+	log.Printf("收到主題的訊息: %s", string(msg))
+})
+```
+
+#### SendText
+
+發送文字訊息給客戶端。
+
+```go
+err := client.SendText("你好，客戶端！")
+if err != nil {
+	log.Println("發送錯誤:", err)
+}
+```
+
+#### SendBinary
+
+發送二進位資料給客戶端。
+
+```go
+err := client.SendBinary([]byte{0x01, 0x02, 0x03})
+if err != nil {
+	log.Println("發送錯誤:", err)
+}
+```
+
+#### Disconnect
+
+根據自訂訊息斷開客戶端。
+
+```go
+client.Disconnect("再見！")
+```
+
+#### StoreKey
+
+為客戶端存儲自訂鍵值對。
+
+```go
+client.StoreKey("role", "admin")
+```
+
+#### DeleteKey
+
+刪除客戶端的自訂鍵值對。
+
+```go
+client.DeleteKey("role")
+```
+
+#### GetKey
+
+獲取客戶端的鍵值對。
+
+```go
+role, ok := client.GetKey("role")
+if ok {
+	log.Printf("客戶端角色: %v", role)
+}
+```
 
 ## 配置選項
 
-您可以在初始化 `Fibril` 時自定義以下選項：
+在初始化 `Fibril` 時，您可以自訂以下選項：
 
-- **ShardCount**: 管理客戶端的分片數量（預設：16）。
-- **MaxMessageSize**: 每個訊息的最大大小（預設：512 bytes）。
-- **MessageBufferSize**: 訊息緩衝區的大小（預設：256）。
-- **WriteWait**: 等待關閉寫入連接的時間（預設：10 秒）。
-- **PongWait**: 等待來自客戶端的 Pong 回應時間（預設：60 秒）。
+- **ShardCount**: 用於管理客戶端的分片數量（預設：16）。
+- **MaxMessageSize**: 最大接收訊息大小（預設：512 字節）。
+- **MessageBufferSize**: 訊息緩衝區大小（預設：256）。
+- **WriteWait**: 關閉寫入連接前的等待時間（預設：10 秒）。
+- **PongWait**: 等待客戶端 Pong 回應的時間（預設：60 秒）。
 - **PingPeriod**: 發送 Ping 訊息的間隔（預設：54 秒）。
 
-範例：
+### 範例：
 
 ```go
 f := fibril.New(
     fibril.WithShardCount(20),
     fibril.WithMaxMessageSize(1024),
+    fibril.WithMessageBufferSize(512),
+    fibril.WithWriteWait(15 * time.Second),
+    fibril.WithPongWait(30 * time.Second),
+    fibril.WithPingPeriod(25 * time.Second),
 )
 ```
 
-## 授權許可
-
-此專案採用 MIT 授權條款 - 詳情請參閱 [LICENSE](LICENSE) 檔案。
-
 ## 貢獻
 
-如果您有興趣貢獻這個專案，可以透過 Fork 專案、改善功能或提交錯誤修正來參與貢獻。
+歡迎 fork 項目、改進功能或提交 bug 修復來貢獻。
+
+## 授權
+
+本專案採用 MIT 授權，詳細內容請參見 [LICENSE](LICENSE) 文件。
