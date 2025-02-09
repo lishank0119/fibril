@@ -26,9 +26,9 @@ func (h *Hub) run() {
 		case b := <-h.broadcast:
 			h.clientMap.ForEach(func(uuid string, client *Client) {
 				if b.filter == nil {
-					client.send <- b // Send message to all clients if no filter is set
+					client.writeMessage(b) // Send message to all clients if no filter is set
 				} else if b.filter(client) {
-					client.send <- b // Send message only to clients that pass the filter
+					client.writeMessage(b) // Send message only to clients that pass the filter
 				}
 			})
 		}
