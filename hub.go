@@ -14,6 +14,10 @@ type Hub struct {
 	pubSub    *pubsub.PubSub                            // Internal Pub/Sub system for message distribution
 }
 
+func (h *Hub) clientLen() int {
+	return h.clientMap.Len()
+}
+
 // publish sends a message to a specific topic using the Pub/Sub system.
 func (h *Hub) publish(topic string, msg []byte) error {
 	return h.pubSub.Publish(topic, msg)

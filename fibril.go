@@ -8,6 +8,11 @@ type Fibril struct {
 	hub    *Hub    // Central hub responsible for managing clients and messages
 }
 
+// ClientLen returns the number of active WebSocket clients connected to the hub.
+func (f *Fibril) ClientLen() int {
+	return f.hub.clientMap.Len()
+}
+
 // Publish sends a message to all subscribers of the specified topic.
 func (f *Fibril) Publish(topic string, msg []byte) error {
 	return f.hub.publish(topic, msg)

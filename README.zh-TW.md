@@ -75,6 +75,14 @@ func main() {
 
 ### Fibril 函式範例
 
+### ClientLen
+
+取得連線客戶端的數量
+
+```go
+f.ClientLen()
+```
+
 #### Publish
 
 發佈一條訊息到指定的主題。

@@ -80,6 +80,14 @@ func main() {
 
 ### Fibril Function Examples
 
+### ClientLen
+
+The number of active WebSocket clients connected to the hub.
+
+```go
+f.ClientLen()
+```
+
 #### Publish
 
 Publishes a message to a specific topic.
