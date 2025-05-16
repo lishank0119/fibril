@@ -80,6 +80,16 @@ func main() {
 
 ### Fibril Function Examples
 
+### ForEachClient
+
+Iterates over all active WebSocket clients and applies the given callback.
+
+```go
+f.ForEachClient(func(uuid string, client *fibril.Client) {
+// handle each client
+})
+```
+
 ### ClientLen
 
 The number of active WebSocket clients connected to the hub.

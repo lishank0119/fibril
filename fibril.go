@@ -8,6 +8,11 @@ type Fibril struct {
 	hub    *Hub    // Central hub responsible for managing clients and messages
 }
 
+// ForEachClient iterates over all connected clients and applies the callback.
+func (f *Fibril) ForEachClient(callback func(uuid string, client *Client)) {
+	f.hub.forEachClient(callback)
+}
+
 // ClientLen returns the number of active WebSocket clients connected to the hub.
 func (f *Fibril) ClientLen() int {
 	return f.hub.clientMap.Len()

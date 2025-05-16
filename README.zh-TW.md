@@ -75,6 +75,16 @@ func main() {
 
 ### Fibril 函式範例
 
+### ForEachClient
+
+遍歷所有已連線的 WebSocket 客戶端，並對每個執行指定的 callback 函式。
+
+```go
+f.ForEachClient(func(uuid string, client *fibril.Client) {
+// 處理每個 client
+})
+```
+
 ### ClientLen
 
 取得連線客戶端的數量
