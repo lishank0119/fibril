@@ -186,6 +186,14 @@ app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
 }))
 ```
 
+### DisconnectAll
+
+斷開所有已連線的 WebSocket 客戶端，並傳送指定的關閉訊息。
+
+```go
+f.DisconnectAll("伺服器即將重啟")
+```
+
 #### DisconnectClient
 
 根據 UUID 斷開指定的客戶端。

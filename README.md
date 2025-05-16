@@ -191,6 +191,14 @@ app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
 }))
 ```
 
+### DisconnectAll
+
+Disconnects all connected WebSocket clients with a given close message.
+
+```go
+f.DisconnectAll("Server restarting")
+```
+
 #### DisconnectClient
 
 Disconnects a specific client by UUID.

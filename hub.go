@@ -75,6 +75,11 @@ func (h *Hub) unregisterClient(client *Client) {
 	h.opt.disconnectHandler(client)
 }
 
+// disconnectAll disconnects all clients with the given close message.
+func (h *Hub) disconnectAll(closeMsg string) {
+	h.disconnectClientFilter(closeMsg, nil)
+}
+
 // disconnectClientFilter disconnects clients based on a provided filter function.
 // If no filter is provided, all clients will be disconnected with the given close message.
 func (h *Hub) disconnectClientFilter(closeMsg string, fn filterFunc) {

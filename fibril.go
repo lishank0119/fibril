@@ -111,6 +111,11 @@ func (f *Fibril) PongHandler(handler handleClientFunc) {
 	f.option.pongHandler = handler
 }
 
+// DisconnectAll disconnects all connected clients with the given close message.
+func (f *Fibril) DisconnectAll(closeMsg string) {
+	f.hub.disconnectAll(closeMsg)
+}
+
 // DisconnectClient disconnects a specific client identified by UUID with an optional close message.
 func (f *Fibril) DisconnectClient(closeMsg string, uuid string) error {
 	return f.hub.disconnectClient(closeMsg, uuid)
