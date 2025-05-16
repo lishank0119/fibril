@@ -14,6 +14,11 @@ type Hub struct {
 	pubSub    *pubsub.PubSub                            // Internal Pub/Sub system for message distribution
 }
 
+// getClient returns the client associated with the given UUID.
+func (h *Hub) getClient(uuid string) (*Client, bool) {
+	return h.clientMap.Get(uuid)
+}
+
 // forEachClient calls the Hub’s ForEachClient to iterate over all clients.
 func (h *Hub) forEachClient(callback func(uuid string, client *Client)) {
 	h.clientMap.ForEach(func(uuid string, client *Client) {

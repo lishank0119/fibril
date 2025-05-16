@@ -85,6 +85,17 @@ f.ForEachClient(func(uuid string, client *fibril.Client) {
 })
 ```
 
+### GetClient
+
+透過 UUID 取得指定連線中的 WebSocket client。
+
+```go
+client, ok := f.GetClient("your-client-uuid")
+if ok {
+client.SendText("Hello!")
+}
+```
+
 ### ClientLen
 
 取得連線客戶端的數量

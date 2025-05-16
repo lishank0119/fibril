@@ -8,6 +8,11 @@ type Fibril struct {
 	hub    *Hub    // Central hub responsible for managing clients and messages
 }
 
+// GetClient proxies the Hub's getClient to retrieve a connected client by UUID.
+func (f *Fibril) GetClient(uuid string) (*Client, bool) {
+	return f.hub.getClient(uuid)
+}
+
 // ForEachClient iterates over all connected clients and applies the callback.
 func (f *Fibril) ForEachClient(callback func(uuid string, client *Client)) {
 	f.hub.forEachClient(callback)

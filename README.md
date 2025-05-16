@@ -90,6 +90,17 @@ f.ForEachClient(func(uuid string, client *fibril.Client) {
 })
 ```
 
+### GetClient
+
+Retrieves a connected WebSocket client by UUID.
+
+```go
+client, ok := f.GetClient("your-client-uuid")
+if ok {
+client.SendText("Hello!")
+}
+```
+
 ### ClientLen
 
 The number of active WebSocket clients connected to the hub.
