@@ -1,6 +1,7 @@
 package fibril
 
 import (
+	"context"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/lishank0119/pubsub"
 	"github.com/lishank0119/shardingmap"
@@ -17,6 +18,18 @@ type Hub struct {
 // getClient returns the client associated with the given UUID.
 func (h *Hub) getClient(uuid string) (*Client, bool) {
 	return h.clientMap.Get(uuid)
+}
+
+// forEachClientWithContext iterates over all clients and stops if context is cancelled.
+func (h *Hub) forEachClientWithContext(ctx context.Context, callback func(uuid string, client *Client)) {
+	h.clientMap.ForEach(func(uuid string, client *Client) {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			callback(uuid, client)
+		}
+	})
 }
 
 // forEachClient calls the Hub’s ForEachClient to iterate over all clients.

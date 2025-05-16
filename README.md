@@ -90,6 +90,19 @@ f.ForEachClient(func(uuid string, client *fibril.Client) {
 })
 ```
 
+### ForEachClientWithContext
+
+Iterates over all active clients and cancels early if the context is done.
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+defer cancel()
+
+f.ForEachClientWithContext(ctx, func(uuid string, client *fibril.Client) {
+// handle each client
+})
+````
+
 ### GetClient
 
 Retrieves a connected WebSocket client by UUID.

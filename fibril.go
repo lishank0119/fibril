@@ -1,6 +1,9 @@
 package fibril
 
-import "github.com/gofiber/contrib/websocket"
+import (
+	"context"
+	"github.com/gofiber/contrib/websocket"
+)
 
 // Fibril represents the core WebSocket server, managing clients and message broadcasting.
 type Fibril struct {
@@ -11,6 +14,11 @@ type Fibril struct {
 // GetClient proxies the Hub's getClient to retrieve a connected client by UUID.
 func (f *Fibril) GetClient(uuid string) (*Client, bool) {
 	return f.hub.getClient(uuid)
+}
+
+// ForEachClientWithContext iterates over clients with support for context cancellation.
+func (f *Fibril) ForEachClientWithContext(ctx context.Context, callback func(uuid string, client *Client)) {
+	f.hub.forEachClientWithContext(ctx, callback)
 }
 
 // ForEachClient iterates over all connected clients and applies the callback.

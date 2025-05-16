@@ -85,6 +85,19 @@ f.ForEachClient(func(uuid string, client *fibril.Client) {
 })
 ```
 
+### ForEachClientWithContext
+
+遍歷所有已連線的 Client，若 context 被取消則提前中止。
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+defer cancel()
+
+f.ForEachClientWithContext(ctx, func(uuid string, client *fibril.Client) {
+// 處理每個 client
+})
+```
+
 ### GetClient
 
 透過 UUID 取得指定連線中的 WebSocket client。
