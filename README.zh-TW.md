@@ -14,6 +14,7 @@ WebSocket 連接、訊息傳遞和訂閱功能。它支援訊息廣播、客戶�
     - [Fibril 函式範例](#fibril-函式範例)
     - [Client 函式範例](#client-函式範例)
 - [配置選項](#配置選項)
+- [PubSub監控功能](#PubSub監控功能)
 - [貢獻](#貢獻)
 - [授權](#授權)
 
@@ -24,6 +25,7 @@ WebSocket 連接、訊息傳遞和訂閱功能。它支援訊息廣播、客戶�
 - ⚡ 支援分片以提高擴展性
 - 🔒 使用 UUID 進行客戶端管理
 - 🗂️ 為每個客戶端提供自訂的鍵值存儲
+- 🧪 監控功能：透過 `ListTopics()` 和 `SubscriberCount(topic)` 可即時檢視 pub/sub 使用狀況
 
 ## 安裝
 
@@ -364,6 +366,15 @@ f := fibril.New(
     fibril.WithPongWait(30 * time.Second),
     fibril.WithPingPeriod(25 * time.Second),
 )
+```
+
+## PubSub監控功能
+
+可透過以下方法檢視當前訂閱情況：
+
+```go
+fibril.ListTopics()           // 回傳目前活躍的 topic 清單
+fibril.SubscriberCount("X")   // 回傳指定 topic 的訂閱者數量
 ```
 
 ## 貢獻

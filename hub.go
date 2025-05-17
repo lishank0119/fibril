@@ -15,6 +15,16 @@ type Hub struct {
 	pubSub    *pubsub.PubSub                            // Internal Pub/Sub system for message distribution
 }
 
+// subscriberCount returns the number of subscribers for a given topic.
+func (h *Hub) subscriberCount(topic string) int {
+	return h.pubSub.SubscriberCount(topic)
+}
+
+// listTopics returns a list of all active topics currently subscribed to.
+func (h *Hub) listTopics() []string {
+	return h.pubSub.ListTopics()
+}
+
 // getClient returns the client associated with the given UUID.
 func (h *Hub) getClient(uuid string) (*Client, bool) {
 	return h.clientMap.Get(uuid)

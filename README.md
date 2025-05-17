@@ -19,6 +19,7 @@ message broadcasting, client management, and publishing messages to subscribed t
     - [Fibril Function Examples](#fibril-function-examples)
     - [Client Function Example](#client-function-example)
 - [Configuration Options](#configuration-options)
+- [Monitoring Topic State](#monitoring-topic-state)
 - [Contributions](#contributions)
 - [License](#license)
 
@@ -29,6 +30,7 @@ message broadcasting, client management, and publishing messages to subscribed t
 - ⚡ Sharding support for better scalability
 - 🔒 Client management with UUIDs
 - 🗂️ Custom key-value storage per client
+- 🧪 Monitoring: `ListTopics()` and `SubscriberCount(topic)` let you introspect pub/sub usage in real-time
 
 ## Installation
 
@@ -369,6 +371,15 @@ f := fibril.New(
     fibril.WithPongWait(30 * time.Second),
     fibril.WithPingPeriod(25 * time.Second),
 )
+```
+
+## Monitoring Topic State
+
+Fibril exposes methods to monitor internal pub/sub state:
+
+```go
+fibril.ListTopics()           // returns []string
+fibril.SubscriberCount("X")   // returns int
 ```
 
 ## Contributions

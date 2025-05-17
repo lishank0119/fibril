@@ -11,6 +11,16 @@ type Fibril struct {
 	hub    *Hub    // Central hub responsible for managing clients and messages
 }
 
+// SubscriberCount returns the number of subscribers currently subscribed to a given topic.
+func (f *Fibril) SubscriberCount(topic string) int {
+	return f.hub.subscriberCount(topic)
+}
+
+// ListTopics returns a list of all currently active topics (i.e., topics with subscribers).
+func (f *Fibril) ListTopics() []string {
+	return f.hub.listTopics()
+}
+
 // GetClient proxies the Hub's getClient to retrieve a connected client by UUID.
 func (f *Fibril) GetClient(uuid string) (*Client, bool) {
 	return f.hub.getClient(uuid)
